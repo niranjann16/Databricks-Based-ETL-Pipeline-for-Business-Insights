@@ -2,46 +2,77 @@
 
 ## 📌 Project Overview
 
-This project demonstrates an end-to-end **data engineering pipeline** built using **Databricks** and **AWS S3**, following the **Medallion Architecture (Bronze, Silver, Gold layers)**.
+This project demonstrates a scalable **data engineering pipeline** built using **Databricks** and **AWS S3**, designed using a **Medallion Architecture (Bronze, Silver, Gold)** with a **multi-organization (Parent–Child) data model**.
 
-The pipeline processes raw business data (sales, product pricing, and related datasets), cleans and standardizes it, and produces analytics-ready datasets for reporting and dashboarding.
-
-This project is based on a guided implementation from Codebasics and enhanced with practical understanding and dashboard creation.
+The pipeline ingests raw data from S3, processes it through layered transformations, and delivers business-ready insights via dashboards and serving layer tools.
 
 ---
 
-## 🗂️ Dataset Description
+## 🏗️ Architecture Overview
 
-The dataset simulates real-world business data and includes:
+![Architecture](project_architecture.png)
 
-* 📦 Product data (product codes, mappings)
-* 💰 Gross price data (contains invalid and inconsistent values)
-* 📅 Date/month column (multiple inconsistent formats)
+### Key Components:
 
-### ⚠️ Data Challenges:
+* ☁️ **AWS S3**
 
-* Dates stored in **multiple formats**
-* Price column contains:
+  * Stores raw data and archive data
+  * Acts as the primary data source
 
-  * Negative values
-  * "unknown" values
-* Missing/incorrect product identifiers
+* ⚙️ **Lakeflow Jobs (Databricks Workflows)**
+
+  * Automates data ingestion and transformation
+  * Orchestrates pipeline execution
+
+* 🥉 **Bronze Layer**
+
+  * Raw data ingestion from S3
+  * Stores unprocessed data for traceability
+
+* 🥈 **Silver Layer**
+
+  * Cleans and transforms data
+  * Handles:
+
+    * Date standardization
+    * Invalid values (negative, null, unknown)
+    * Data enrichment via joins
+
+* 🥇 **Gold Layer**
+
+  * Aggregated business data
+  * Generates KPIs and analytics tables
 
 ---
 
-## 🧱 Architecture
+## 🏢 Multi-Organization Data Model
 
-The project follows **Medallion Architecture**:
+### 🔹 Child Company
 
-```id="y2r7s1"
-AWS S3 → Bronze → Silver → Gold → Dashboard
-```
+* Owns the complete pipeline:
 
-* ☁️ **AWS S3** → Raw data storage
-* 🥉 **Bronze Layer** → Raw ingested data
-* 🥈 **Silver Layer** → Cleaned & transformed data
-* 🥇 **Gold Layer** → Business-ready data
-* 📊 **Dashboard** → Insights
+  * Bronze → Silver → Gold
+* Processes and prepares cleaned data
+
+### 🔹 Parent Company
+
+* Consumes **Gold layer data** from child company
+* Performs additional aggregation
+* Maintains centralized **analytics table**
+
+👉 This simulates a real-world **data sharing and consolidation architecture**
+
+---
+
+## 📊 Serving Layer
+
+The final data is consumed through:
+
+* 📊 **Dashboards (Databricks SQL)**
+* 🤖 **Genie / BI tools**
+* 📈 Business reporting systems
+
+👉 Enables decision-making using clean, structured data
 
 ---
 
@@ -52,85 +83,77 @@ AWS S3 → Bronze → Silver → Gold → Dashboard
 * SQL
 * Delta Lake
 * AWS S3
+* Databricks Workflows (Lakeflow Jobs)
 
 ---
 
 ## 🔄 Data Pipeline Workflow
 
-### 🔹 1. Data Ingestion (Bronze Layer)
+### 🔹 1. Data Ingestion
 
-* Uploaded raw datasets to **AWS S3**
-* Connected S3 with Databricks
-* Loaded raw data into **Bronze Delta tables**
-* No transformation applied (raw format preserved)
+* Raw data is stored in **AWS S3**
+* Lakeflow Jobs ingest data into Bronze tables
 
 ---
 
-### 🔹 2. Data Transformation (Silver Layer)
+### 🔹 2. Data Transformation
 
-Performed key real-world data cleaning:
+* Bronze → Silver:
 
-#### 📅 Date Standardization
-
-* Used `try_to_date()` with multiple formats
-* Applied `coalesce()` to select valid date
-* Converted all dates into a **uniform format**
-
-#### 💰 Price Cleaning
-
-* Converted negative values → positive
-* Replaced "unknown"/invalid values → 0
-* Cast values to numeric format
-
-#### 🔗 Data Enrichment
-
-* Mapped product codes to proper product IDs
-* Joined multiple datasets for consistency
+  * Cleaned inconsistent date formats
+  * Fixed invalid price values
+  * Removed null/unknown data
+  * Joined datasets for enrichment
 
 ---
 
-### 🔹 3. Data Aggregation (Gold Layer)
+### 🔹 3. Data Aggregation
 
-* Created business-level tables
-* Generated KPIs:
+* Silver → Gold:
 
-  * Total Revenue
-  * Product Performance
-  * Sales Trends
-* Optimized tables for reporting
+  * Created KPI tables
+  * Aggregated revenue and product metrics
 
 ---
 
-## 📊 Dashboard
+### 🔹 4. Data Sharing
 
-Developed an interactive dashboard in Databricks to visualize:
+* Gold data from **Child Company** is shared with **Parent Company**
+* Parent layer performs further aggregation
 
-* 📈 Sales trends over time
-* 💰 Total revenue
-* 📦 Top-performing products
+---
+
+### 🔹 5. Data Consumption
+
+* Data exposed via:
+
+  * Dashboards
+  * BI tools
+  * Analytics platforms
+
+---
+
+## 📊 Dashboard Features
+
+* 📈 Sales trends
+* 💰 Revenue metrics
+* 📦 Product performance
 * ⚠️ Low-performing products
-
-### Dashboard Features:
-
-* KPI cards (Revenue, Orders, Quantity, Avg Order Value)
-* Time-series analysis
-* Product-level insights
-* Interactive filters (date, category)
+* 🎛️ Interactive filters
 
 ---
 
 ## 🎯 Key Learnings
 
-* Built an end-to-end data pipeline using Databricks
-* Implemented Medallion Architecture (Bronze → Silver → Gold)
-* Handled real-world messy data (dates, invalid values)
-* Integrated AWS S3 with Databricks
-* Performed data transformation using PySpark & SQL
-* Created analytics dashboards
+* Designed Medallion Architecture using Databricks
+* Integrated AWS S3 with Databricks pipelines
+* Built multi-layer ETL workflows
+* Implemented Parent–Child data architecture
+* Automated pipelines using Lakeflow Jobs
+* Created analytics dashboards for business insights
 
 
 ---
-
 
 ## 👤 Author
 
