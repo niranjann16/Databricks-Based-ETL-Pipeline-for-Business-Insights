@@ -10,7 +10,7 @@ The pipeline ingests raw data from S3, processes it through layered transformati
 
 ## 🏗️ Architecture Overview
 
-![Architecture](project_architecture.png)
+![Architecture](https://github.com/niranjann16/Databricks-Based-ETL-Pipeline-for-Business-Insights/blob/main/project_architecture.png)
 
 ### Key Components:
 
